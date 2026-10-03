@@ -381,15 +381,43 @@
 
     document.getElementById('saludo').innerText = 'Hola ' + usuario + ', ¿a dónde iremos hoy?';
 
-    // REGISTRO AUTOMÁTICO DE APERTURA AL CARGAR LA PÁGINA
+   // REGISTRO AUTOMÁTICO DE APERTURA AL CARGAR LA PÁGINA
     window.onload = function() {
       fetch(API_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario: usuario, accion: 'Apertura de Link' })
+        body: JSON.stringify({ 
+          usuario: usuario, 
+          accion: 'Apertura de Link',
+          pestana: 'Registros COLABORADORES' // Pestaña de destino
+        })
       });
     };
+
+    // CONFIRMAR Y REGISTRAR SELECCIÓN EN GOOGLE SHEETS
+    function confirmarRegistro() {
+      document.getElementById('vista-detalle').style.display = 'none';
+      document.getElementById('loader').style.display = 'block';
+
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          usuario: usuario, 
+          accion: 'Seleccion', 
+          opcion: opcionSeleccionada,
+          pestana: 'Registros COLABORADORES' // Pestaña de destino
+        })
+      }).then(() => {
+        document.getElementById('loader').style.display = 'none';
+        mostrarVistaFinal();
+      }).catch(() => {
+        document.getElementById('loader').style.display = 'none';
+        mostrarVistaFinal();
+      });
+    }
 
     // BASE DE DATOS DE INFORMACIÓN DE LOS CONVENIOS
     const convenios = {
