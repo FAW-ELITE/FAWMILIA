@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selección de Convenios - FAW ELITE</title>
+  <style>
+    /* FONDO REPETITIVO EN TODA LA PÁGINA */
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      text-align: center; 
+      padding: 20px 15px; 
+      margin: 0; 
+      background-image: url('https://grupostep.com.mx/wp-content/uploads/2026/08/BG-FAWELITE-2026.webp');
+      background-repeat: repeat; 
+      background-position: top left;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    /* LOGOTIPO DE LA EMPRESA (CABECERA PRINCIPAL) */
+    .company-logo {
+      width: 170px;
+      height: auto;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      object-fit: contain;
+    }
+
+    /* TEXTOS EN LETRA BLANCA CON SOMBRA */
+    h1 { 
+      color: #ffffff; 
+      font-size: 24px; 
+      margin-top: 5px; 
+      margin-bottom: 5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.7); 
+    }
+    
+    p.subtitulo { 
+      color: #ffffff; 
+      font-size: 15px; 
+      margin-top: 0;
+      margin-bottom: 25px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7); 
+    }
+
+    /* ACOMODO EN 2 COLUMNAS + CENTRADO DEL ÚLTIMO ELEMENTO EN CASO IMPAR */
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(2, 1fr); 
+      gap: 20px 15px; 
+      max-width: 380px; 
+      margin: 0 auto; 
+    }
+
+    .grid .card-container:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - 7.5px);
+    }
+
+    @media (max-width: 340px) {
+      .grid .card-container:last-child:nth-child(odd) {
+        width: 100%;
+      }
+    }
+
+    /* CONTENEDOR DE CADA TARJETA */
+    .card-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* ETIQUETA / PESTAÑA DE UBICACIÓN */
+    .badge-location {
+      background-color: #2c3e50;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px 6px 0 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+      width: 85%;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 1;
+    }
+
+    /* TARJETA CON LOGO */
+    .card { 
+      background: white; 
+      border-radius: 0 0 15px 15px; 
+      padding: 15px 10px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25); 
+      cursor: pointer; 
+      transition: transform 0.2s, box-shadow 0.2s; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .card:active { 
+      transform: scale(0.95); 
+    }
+
+    .card img { 
+      width: 100%; 
+      max-width: 100px;
+      height: 90px; 
+      object-fit: contain; 
+      margin-bottom: 8px; 
+    }
+
+    .card span { 
+      font-weight: bold; 
+      color: #333; 
+      font-size: 13px; 
+    }
+
+    /* TARJETA MODAL / VISTAS DE DETALLE Y CONFIRMACIÓN */
+    .modal-view {
+      display: none;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px;
+      max-width: 420px;
+      margin: 10px auto;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    /* LOGO PERSISTENTE EN LA PARTE SUPERIOR DE LAS VISTAS */
+    .selected-option-header {
+      text-align: center;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+
+    .selected-option-header img {
+      width: 120px;
+      height: 90px;
+      object-fit: contain;
+    }
+
+    .selected-option-header h2 {
+      margin: 5px 0 0 0;
+      color: #2c3e50;
+      font-size: 20px;
+    }
+
+    /* CONTENIDO DEL CONVENIO */
+    .modal-content h3 {
+      color: #e74c3c;
+      font-size: 16px;
+      margin: 12px 0 6px 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+    }
+
+    .modal-content ul {
+      margin: 6px 0 12px 0;
+      padding-left: 20px;
+      color: #444;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .modal-content p, .modal-content li {
+      color: #444;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* BOTONES */
+    .btn-action {
+      display: block;
+      width: 100%;
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+      transition: background 0.2s;
+      text-align: center;
+    }
+
+    .btn-action:active {
+      background: #219150;
+    }
+
+    .btn-back {
+      display: block;
+      width: 100%;
+      background: #7f8c8d;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* CARGADOR */
+    #loader { 
+      display: none; 
+      margin-top: 40px; 
+      font-size: 18px; 
+      color: #ffffff; 
+      font-weight: bold; 
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+    }
+
+    /* VISTA DE CONFIRMACIÓN CON IMAGEN */
+    .final-image {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-top: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 15px;
+      border: 1px solid #c3e6cb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGO DE FAW ELITE / GRUPO STEP -->
+  <img src="https://grupostep.com.mx/wp-content/uploads/2025/09/Logos-Narobia-blaco.png" alt="FAW Elite" class="company-logo">
+
+  <!-- VISTA 1: CATÁLOGO DE OPCIONES -->
+  <div id="vista-seleccion">
+    <h1 id="saludo">Cargando...</h1>
+    <p class="subtitulo" id="subtitulo">Selecciona una opción para consultar su convenio:</p>
+
+    <div class="grid" id="opciones">
+      <!-- IHOP -->
+      <div class="card-container">
+        <div class="badge-location">Zona Noroeste de México</div>
+        <div class="card" onclick="verDetalle('IHOP')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-IHOP-300x300.png" alt="IHOP">
+          <span>IHOP</span>
+        </div>
+      </div>
+
+      <!-- CHILTEPINOS -->
+      <div class="card-container">
+        <div class="badge-location">Hermosillo, Sonora</div>
+        <div class="card" onclick="verDetalle('CHILTEPINOS')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-CHILTEPINOS-300x300.png" alt="CHILTEPINOS">
+          <span>CHILTEPINOS</span>
+        </div>
+      </div>
+
+      <!-- SALUD DIGNA -->
+      <div class="card-container">
+        <div class="badge-location">Nacional</div>
+        <div class="card" onclick="verDetalle('SALUD DIGNA')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-SALUD-DIGNA-300x300.png" alt="SALUD DIGNA">
+          <span>SALUD DIGNA</span>
+        </div>
+      </div>
+
+      <!-- N ROUTE -->
+      <div class="card-container">
+        <div class="badge-location">Hermosillo</div>
+        <div class="card" onclick="verDetalle('N ROUTE')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-NROUTE-300x300.png" alt="N ROUTE">
+          <span>N ROUTE</span>
+        </div>
+      </div>
+
+      <!-- SKY PLACE -->
+      <div class="card-container">
+        <div class="badge-location">Hermosillo</div>
+        <div class="card" onclick="verDetalle('SKY PLACE')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-SKYPLACE.png" alt="SKY PLACE">
+          <span>SKY PLACE</span>
+        </div>
+      </div>
+
+      <!-- CHOPO -->
+      <div class="card-container">
+        <div class="badge-location">Nacional</div>
+        <div class="card" onclick="verDetalle('CHOPO')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-chopo.png" alt="CHOPO">
+          <span>CHOPO</span>
+        </div>
+      </div>
+
+      <!-- KIDZANIA -->
+      <div class="card-container">
+        <div class="badge-location">Nacional</div>
+        <div class="card" onclick="verDetalle('KIDZANIA')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-kidzania.png" alt="KIDZANIA">
+          <span>KIDZANIA</span>
+        </div>
+      </div>
+
+      <!-- KARNE GARIBALDI -->
+      <div class="card-container">
+        <div class="badge-location">Jalisco</div>
+        <div class="card" onclick="verDetalle('KARNE GARIBALDI')">
+          <img src="https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-karne-garibaldi.png" alt="KARNE GARIBALDI">
+          <span>KARNE GARIBALDI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA 2: DETALLE DEL CONVENIO Y CONFIRMACIÓN INTERMEDIA -->
+  <div id="vista-detalle" class="modal-view">
+    <div class="selected-option-header">
+      <img id="detail-logo" src="" alt="Logo Convenio">
+      <h2 id="detail-title"></h2>
+    </div>
+
+    <div class="modal-content" id="detail-body">
+      <!-- Contenido dinámico -->
+    </div>
+
+    <button class="btn-action" onclick="confirmarRegistro()">Acepto la promoción / Registrar selección</button>
+    <button class="btn-back" onclick="volverASeleccion()">Regresar a las opciones</button>
+  </div>
+
+  <!-- VISTA CARGANDO -->
+  <div id="loader">Registrando tu elección...</div>
+
+  <!-- VISTA 3: MENSAJE/IMAGEN POSTERIOR AL REGISTRO -->
+  <div id="vista-final" class="modal-view">
+    <div class="selected-option-header">
+      <img id="final-logo" src="" alt="Logo Convenio">
+      <h2 id="final-title"></h2>
+    </div>
+
+    <div class="alert-success">
+      ¡Tu selección ha sido registrada con éxito!
+    </div>
+
+    <div id="final-content" style="text-align: center;">
+      <!-- Imagen o mensaje final -->
+    </div>
+  </div>
+
+  <script>
+    // URL DE TU BACKEND EN GOOGLE APPS SCRIPT
+    const API_URL = "https://script.google.com/macros/s/AKfycbw9h-0d2SKhwNEP6XcHoHoNxATXq8QQXeAi9PCxc3w/exec";
+    
+    // OBTENER PARÁMETRO DE USUARIO DESDE LA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const usuario = urlParams.get('usuario') || 'Usuario';
+    
+    let opcionSeleccionada = "";
+
+    document.getElementById('saludo').innerText = 'Hola ' + usuario + ', ¿a dónde iremos hoy?';
+
+    // REGISTRO AUTOMÁTICO DE APERTURA AL CARGAR LA PÁGINA
+    window.onload = function() {
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: usuario, accion: 'Apertura de Link' })
+      });
+    };
+
+    // BASE DE DATOS DE INFORMACIÓN DE LOS CONVENIOS
+    const convenios = {
+      'IHOP': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-IHOP-300x300.png',
+        promocion: '<p><strong>15% de descuento</strong> en su consumo.</p>',
+        sucursales: '<p>Aplica en sucursales de la <strong>Zona Noroeste de México</strong>.</p>',
+        imagenFinal: 'https://grupostep.com.mx/wp-content/uploads/2026/10/FE-03.jpeg'
+      },
+      'CHILTEPINOS': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-CHILTEPINOS-300x300.png',
+        promocion: `
+          <ul>
+            <li>Descuento del <strong>15%</strong> sobre el consumo realizado en las sucursales participantes.</li>
+            <li>El beneficio podrá extenderse a familiares directos, siempre y cuando indiquen que son parte de <strong>FAW Trucks Elam Step México</strong>.</li>
+            <li>El beneficio será válido durante toda la semana, incluyendo días festivos.</li>
+            <li>También podrán acceder a un menú especial ejecutivo, disponible de lunes a viernes. El usuario podrá elegir entre utilizar el descuento de la alianza o el menú especial.</li>
+            <li>Estos beneficios también aplican para pedidos para llevar, siempre y cuando se realice el pedido llamando directamente al restaurante y se recoja en la sucursal correspondiente.</li>
+          </ul>`,
+        sucursales: `
+          <ul>
+            <li><strong>Lomas:</strong> De los Ganaderos 1249, Las Lomas, 83270 Hermosillo, Son.</li>
+            <li><strong>Centro:</strong> C. Benito Juárez 47, Centro, 83000 Hermosillo, Son.</li>
+            <li><strong>Santa Fe:</strong> Plaza Santa Fe, Periférico Poniente No. 153, Locales 8 y 9, Santa Fe, 83249 Hermosillo, Son.</li>
+            <li><strong>Quiroga:</strong> Blvd. Antonio Quiroga 118, Real de Quiroga, Sección Madrigal, 83224 Hermosillo, Son.</li>
+          </ul>`,
+        imagenFinal: null,
+        mensajeFinal: '<p style="color: #555; margin-top:15px;">Muestra esta pantalla en caja o menciona el convenio <strong>FAW Trucks Elam Step México</strong> al realizar tu pedido.</p>'
+      },
+      'SALUD DIGNA': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-SALUD-DIGNA-300x300.png',
+        promocion: `
+          <p><strong>10% de descuento</strong> en estudios clínicos.</p>
+          <p><strong>Servicios aplicables:</strong></p>
+          <ul>
+            <li>Laboratorio Clínico</li>
+            <li>Resonancia Magnética</li>
+            <li>Lentes</li>
+            <li>Tomografía</li>
+            <li>Ultrasonido</li>
+          </ul>`,
+        sucursales: '<p>Aplica en sucursales a nivel <strong>Nacional</strong>.</p>',
+        imagenFinal: 'https://grupostep.com.mx/wp-content/uploads/2026/10/FE-01.jpg'
+      },
+      'N ROUTE': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-NROUTE-300x300.png',
+        promocion: `
+          <p><strong>15% de descuento.</strong></p>
+          <p><strong>Restricciones:</strong></p>
+          <ul>
+            <li>No aplica en alcohol.</li>
+            <li>No aplica en cigarros.</li>
+            <li>No aplica en conjunto con otras promociones.</li>
+          </ul>`,
+        sucursales: '<p>Aplica en sucursales de <strong>Hermosillo</strong>.</p>',
+        imagenFinal: null,
+        mensajeFinal: '<p style="color: #555; margin-top:15px;">Presenta tu identificación corporativa o menciona tu beneficio al solicitar tu cuenta.</p>'
+      },
+      'SKY PLACE': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/09/logo-FAWELITE-SKYPLACE.png',
+        promocion: `
+          <ul>
+            <li><strong>20% de descuento</strong> en el paquete de tu preferencia.</li>
+            <li><strong>20% de descuento</strong> en entrada para colaboradores y familiares.</li>
+          </ul>
+          <p style="font-size:12px; color:#e74c3c;"><em>* Es necesario mostrar una identificación laboral.</em></p>`,
+        sucursales: '<p>Aplica en <strong>Hermosillo</strong>.</p>',
+        imagenFinal: 'https://grupostep.com.mx/wp-content/uploads/2026/10/FE-02.jpeg'
+      },
+      'CHOPO': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-chopo.png',
+        promocion: `
+          <ul>
+            <li><strong>20% de descuento</strong> en laboratorios.</li>
+            <li><strong>15% de descuento</strong> en gabinetes.</li>
+            <li><strong>15% de descuento</strong> en estudios especiales.</li>
+          </ul>`,
+        sucursales: '<p>Aplica en sucursales a nivel <strong>Nacional</strong>.</p>',
+        imagenFinal: 'https://grupostep.com.mx/wp-content/uploads/2026/10/FE-04-scaled.jpg'
+      },
+      'KIDZANIA': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-kidzania.png',
+        promocion: `
+          <p><strong>Boletos de Entrada:</strong></p>
+          <ul>
+            <li>Efectivo: <strong>15% de descuento</strong></li>
+            <li>TCD: <strong>10% de descuento</strong></li>
+          </ul>
+          <p><strong>Fiestas (Paquete Temático):</strong></p>
+          <ul>
+            <li>Efectivo: <strong>15% de descuento</strong></li>
+            <li>TCD: <strong>10% de descuento</strong></li>
+          </ul>
+          <p><strong>Noches de Amigos:</strong></p>
+          <ul>
+            <li>Efectivo: <strong>15% de descuento</strong></li>
+            <li>TCD: <strong>10% de descuento</strong></li>
+          </ul>`,
+        sucursales: '<p>Aplica a nivel <strong>Nacional</strong>.</p>',
+        imagenFinal: null,
+        mensajeFinal: '<p style="color: #555; margin-top:15px;">Muestra tu identificación o menciona el convenio al comprar tus accesos en taquilla.</p>'
+      },
+      'KARNE GARIBALDI': {
+        logo: 'https://grupostep.com.mx/wp-content/uploads/2026/10/logo-FAWELITE-karne-garibaldi.png',
+        promocion: '<p><strong>10% de descuento</strong> en consumo individual.</p>',
+        sucursales: `
+          <ul>
+            <li><strong>Santa Tere:</strong> C. Garibaldi 1306, Santa Teresita, 44200 Guadalajara, Jal.</li>
+            <li><strong>Plaza del Sol:</strong> Av. Mariano Otero 3019, La Giralda, 45088 Zapopan, Jal.</li>
+            <li><strong>Tlaquepaque:</strong> Blvd. Gral. Marcelino García Barragán 1627, Cd Universitaria, 44840 Guadalajara, Jal.</li>
+            <li><strong>Centro Zapopan:</strong> Av. Hidalgo 352, Cabecera Municipal. Centro, Local 10, 44100 Zapopan, Jal.</li>
+            <li><strong>Galerías:</strong> FF-10, Av Rafael Sanzio 150-Local, Camichines Vallarta, 45020 Zapopan, Jal.</li>
+            <li><strong>Chedraui:</strong> Av. Acueducto 6050, Lomas del Bosque, Chedraui, 45118 Zapopan, Jal.</li>
+          </ul>`,
+        imagenFinal: null,
+        mensajeFinal: '<p style="color: #555; margin-top:15px;">Presenta tu identificación corporativa al solicitar la cuenta en el restaurante.</p>'
+      }
+    };
+
+    // PASO INTERMEDIO: VER INFORMACIÓN DEL CONVENIO
+    function verDetalle(opcion) {
+      opcionSeleccionada = opcion;
+      const data = convenios[opcion];
+
+      if (!data) {
+        console.error("Opción no encontrada:", opcion);
+        return;
+      }
+
+      document.getElementById('detail-logo').src = data.logo;
+      document.getElementById('detail-title').innerText = opcion;
+
+      let htmlContent = `
+        <h3>Promoción</h3>
+        ${data.promocion}
+        <h3>Sucursales / Lugares donde aplica</h3>
+        ${data.sucursales}
+      `;
+
+      document.getElementById('detail-body').innerHTML = htmlContent;
+
+      document.getElementById('vista-seleccion').style.display = 'none';
+      document.getElementById('vista-detalle').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function volverASeleccion() {
+      document.getElementById('vista-detalle').style.display = 'none';
+      document.getElementById('vista-seleccion').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    // CONFIRMAR Y REGISTRAR SELECCIÓN EN GOOGLE SHEETS
+    function confirmarRegistro() {
+      document.getElementById('vista-detalle').style.display = 'none';
+      document.getElementById('loader').style.display = 'block';
+
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: usuario, accion: 'Seleccion', opcion: opcionSeleccionada })
+      }).then(() => {
+        document.getElementById('loader').style.display = 'none';
+        mostrarVistaFinal();
+      }).catch(() => {
+        document.getElementById('loader').style.display = 'none';
+        mostrarVistaFinal();
+      });
+    }
+
+    // MOSTRAR VISTA FINAL CON LOGO PERSISTENTE E IMAGEN/MENSAJE
+    function mostrarVistaFinal() {
+      const data = convenios[opcionSeleccionada];
+
+      document.getElementById('final-logo').src = data.logo;
+      document.getElementById('final-title').innerText = opcionSeleccionada;
+
+      const container = document.getElementById('final-content');
+      container.innerHTML = '';
+
+      if (data.imagenFinal) {
+        const img = document.createElement('img');
+        img.src = data.imagenFinal;
+        img.alt = 'Promoción ' + opcionSeleccionada;
+        img.className = 'final-image';
+        container.appendChild(img);
+      } else if (data.mensajeFinal) {
+        container.innerHTML = data.mensajeFinal;
+      }
+
+      document.getElementById('vista-final').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+  </script>
+
+</body>
+</html>
